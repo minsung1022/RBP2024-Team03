@@ -37,7 +37,36 @@ class DetermineColor(Node):
             # msg.frame_id = '0'  # STOP
             # msg.frame_id = '-1' # CW
 
+            # msg.frame_id = '-1' # CW
+
             def color_detector():
+              class ConvexHull:
+                def __init__(self, points):
+                    self.points = np.array(points)
+                    self.vertices = self._graham_scan(self.points)
+
+                def _graham_scan(self, points):
+                    def polar_angle(p0, p1):
+                        from math import atan2
+                        return atan2(p1[1] - p0[1], p1[0] - p0[0])
+
+                    def distance(p0, p1):
+                        return (p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2
+
+                    def ccw(p1, p2, p3):
+                        return (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0])
+
+                    start = min(points, key=lambda p: (p[1], p[0]))
+
+                    sorted_points = sorted(points, key=lambda p: (polar_angle(start, p), distance(start, p)))
+                    hull = []
+                    for p in sorted_points:
+                        while len(hull) > 1 and ccw(hull[-2], hull[-1], p) <= 0:
+                            hull.pop()
+                        hull.append(p)
+
+                    hull_indices = [np.where((points == h).all(axis=1))[0][0] for h in hull]
+                    return np.array(hull_indices)
               def homograph(hsv_image,best_quadrilateral):
                 cv2.drawContours(hsv_image, [best_quadrilateral], -1, (255, 0, 0), 5)
                 approx = best_quadrilateral.reshape(4, 2)
@@ -400,7 +429,7 @@ class DetermineColor(Node):
                       return step2()
 
 
-              return step3()
+              return step1()
 
             
             most_dominant_color=color_detector()
