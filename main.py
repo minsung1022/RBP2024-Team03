@@ -38,7 +38,6 @@ class DetermineColor(Node):
 
             def color_detector():
               class ConvexHull:
-                print("Hello")
                 def __init__(self, points):
                     self.points = np.array(points)
                     self.vertices = self._graham_scan(self.points)
