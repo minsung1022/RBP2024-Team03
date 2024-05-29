@@ -400,7 +400,7 @@ class DetermineColor(Node):
                       return step2()
 
 
-              return step1()
+              return step3()
 
             
             most_dominant_color=color_detector()
