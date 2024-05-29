@@ -6,7 +6,6 @@ import cv2
 from glob import glob
 from itertools import combinations
 from math import atan2, sqrt, degrees
-from scipy.spatial import ConvexHull
 import time
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
