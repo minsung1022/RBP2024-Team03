@@ -227,7 +227,7 @@ class DetermineColor(Node):
 
                   return [list(intersections[i]) for i in hull.vertices]
 
-              def step3():
+              def step():
                   start=time.time()
                   image=IMG.copy()
                   gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -300,136 +300,8 @@ class DetermineColor(Node):
 
                   else:
                       return final()
-              def step2():
-                  image=IMG.copy()
-                  hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-
-                  lower_black = np.array([0, 0, 0])
-                  upper_black = np.array([180, 255, 70])
-                  mask = cv2.inRange(hsv, lower_black, upper_black)
-
-
-                  contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-
-                  max_area = 0
-                  best_quadrilateral = None
-                  for contour in contours:
-                      approx = cv2.approxPolyDP(contour, 0.02 * cv2.arcLength(contour, True), True)
-                      if len(approx) == 4:
-                          area = cv2.contourArea(approx)
-                          if area > max_area:
-                              max_area = area
-                              best_quadrilateral = approx
-
-                  if best_quadrilateral is not None:
-
-                      cv2.polylines(image, [best_quadrilateral], True, (255, 255, 0), 2)
-
-                      mask = np.zeros(image.shape[:2], dtype=np.uint8)
-                      cv2.fillPoly(mask, [best_quadrilateral], 255)
-                      masked_image = cv2.bitwise_and(image, image, mask=mask)
-                      mask_pixel_count = cv2.countNonZero(mask)
-                      if mask_pixel_count>=2000:
-
-
-                          hsv_image = cv2.cvtColor(masked_image, cv2.COLOR_BGR2HSV)
-
-                          hsv_image=homograph(hsv_image,best_quadrilateral)
-
-                          lower_red1, upper_red1 = (0, 50, 50), (20, 256, 256)
-                          lower_red2, upper_red2 = (160, 50, 50), (180, 256, 256)
-                          lower_blue, upper_blue = (100, 50, 50), (140, 256, 256)
-
-
-                          red_mask1 = cv2.inRange(hsv_image, lower_red1, upper_red1)
-                          red_mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
-                          blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
-
-
-                          red_mask = cv2.bitwise_or(red_mask1, red_mask2)
-
-                          h, w, _=hsv_image.shape
-                          red_sum = np.sum(red_mask > 0)
-                          blue_sum = np.sum(blue_mask > 0)
-                          other_sum = h*w-red_sum-blue_sum
-
-                          #print(red_sum, blue_sum, other_sum)
-                          rgb_sums = {'R': red_sum, 'O': other_sum, 'B': blue_sum}
-                          most_dominant_color = max(rgb_sums, key=rgb_sums.get)
-                          return most_dominant_color
-                      else:
-                          return step3()
-                  else:
-                      return step3()
-              def step1():
-                  image=IMG.copy()
-                  hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-
-                  lower_black = np.array([0, 0, 0])
-                  upper_black = np.array([180, 255, 50])
-                  mask = cv2.inRange(hsv, lower_black, upper_black)
-
-
-                  contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-
-                  max_area = 0
-                  best_quadrilateral = None
-                  for contour in contours:
-                      approx = cv2.approxPolyDP(contour, 0.02 * cv2.arcLength(contour, True), True)
-                      if len(approx) == 4:
-                          area = cv2.contourArea(approx)
-                          if area > max_area:
-                              max_area = area
-                              best_quadrilateral = approx
-
-                  if best_quadrilateral is not None:
-                      cv2.polylines(image, [best_quadrilateral], True, (255, 255, 0), 2)
-
-                      mask = np.zeros(image.shape[:2], dtype=np.uint8)
-                      cv2.fillPoly(mask, [best_quadrilateral], 255)
-                      masked_image = cv2.bitwise_and(image, image, mask=mask)
-                      mask_pixel_count = cv2.countNonZero(mask)
-                      if mask_pixel_count>=2000:
-
-
-                          hsv_image = cv2.cvtColor(masked_image, cv2.COLOR_BGR2HSV)
-
-                          hsv_image=homograph(hsv_image,best_quadrilateral)
-
-                          lower_red1, upper_red1 = (0, 50, 50), (20, 256, 256)
-                          lower_red2, upper_red2 = (160, 50, 50), (180, 256, 256)
-                          lower_blue, upper_blue = (100, 50, 50), (140, 256, 256)
-
-
-                          red_mask1 = cv2.inRange(hsv_image, lower_red1, upper_red1)
-                          red_mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
-                          blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
-
-
-                          red_mask = cv2.bitwise_or(red_mask1, red_mask2)
-
-                          h, w, _=hsv_image.shape
-                          red_sum = np.sum(red_mask > 0)
-                          blue_sum = np.sum(blue_mask > 0)
-                          other_sum = h*w-red_sum-blue_sum
-
-
-
-                          #print(red_sum, blue_sum, other_sum)
-                          rgb_sums = {'R': red_sum, 'O': other_sum, 'B': blue_sum}
-                          most_dominant_color = max(rgb_sums, key=rgb_sums.get)
-                          return most_dominant_color
-                      else:
-                          return step2()
-                  else:
-                      return step2()
-
-
-              return step1()
+              return step()
 
             
             most_dominant_color=color_detector()
