@@ -39,19 +39,12 @@ class DetermineColor(Node):
 
             def color_detector():
               def homograph(hsv_image,best_quadrilateral):
-                # 이미지에서 검출된 사각형을 변환하는 함수
-
-                # 컨투어 그리기
                 cv2.drawContours(hsv_image, [best_quadrilateral], -1, (255, 0, 0), 5)
-
-                # 컨투어 좌표 재구성
                 approx = best_quadrilateral.reshape(4, 2)
 
-                # 사각형의 폭과 높이 계산
                 width = max(np.linalg.norm(approx[0] - approx[1]), np.linalg.norm(approx[2] - approx[3]))
                 height = max(np.linalg.norm(approx[0] - approx[3]), np.linalg.norm(approx[1] - approx[2]))
 
-                # 목표 점 설정
                 dst_points = np.array([
                     [0, 0],
                     [width - 1, 0],
@@ -59,10 +52,8 @@ class DetermineColor(Node):
                     [0, height - 1]
                 ], dtype=np.float32)
 
-                # 호모그래피 행렬 계산
                 H = cv2.getPerspectiveTransform(np.float32(approx), dst_points)
 
-                # 이미지 투시 변환
                 warped_image = cv2.warpPerspective(hsv_image, H, (int(width), int(height)))
                 return warped_image
               def final():
